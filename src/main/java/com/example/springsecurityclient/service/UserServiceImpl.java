@@ -79,21 +79,37 @@ public class UserServiceImpl implements UserService {
     public VerificationToken generateNewVerificationToken(String oldToken, String email) {
         User user = userRepository.findByEmail(email);
         VerificationToken verificationToken = verificationTokenRepository.findByToken(oldToken);
-        if (verificationToken == null) {
+        VerificationToken verificationTokenEmail = verificationTokenRepository.findByUser(user);
+        if (verificationToken == null && verificationTokenEmail == null) {
             VerificationToken newVerificationToken = new VerificationToken(user, UUID.randomUUID().toString());
             verificationTokenRepository.save(newVerificationToken);
             return newVerificationToken;
+        } else {
+            if (verificationToken != null) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(new Date().getTime());
+                calendar.add(Calendar.MINUTE, 10);
+
+                verificationToken.setExpirationTime(new Date(calendar.getTime().getTime()));
+                verificationToken.setToken(UUID.randomUUID().toString());
+                verificationTokenRepository.save(verificationToken);
+
+                return verificationToken;
+            }
+            if (verificationTokenEmail != null) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(new Date().getTime());
+                calendar.add(Calendar.MINUTE, 10);
+
+                verificationTokenEmail.setExpirationTime(new Date(calendar.getTime().getTime()));
+                verificationTokenEmail.setToken(UUID.randomUUID().toString());
+                verificationTokenRepository.save(verificationTokenEmail);
+
+                return verificationTokenEmail;
+            }
         }
-        // verificationTokenRepository.deleteBy(oldToken);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(new Date().getTime());
-        calendar.add(Calendar.MINUTE, 10);
+        return null;
 
-        verificationToken.setExpirationTime(new Date(calendar.getTime().getTime()));
-        verificationToken.setToken(UUID.randomUUID().toString());
-        verificationTokenRepository.save(verificationToken);
-
-        return verificationToken;
     }
 
     @Override
@@ -108,7 +124,13 @@ public class UserServiceImpl implements UserService {
         // passwordResetTokenRepository.deleteAll();
         PasswordResetToken oldPasswordResetToken = passwordResetTokenRepository.findByUser(user);
         if (oldPasswordResetToken != null) {
+            // set time is very importtant
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(new Date().getTime());
+            calendar.add(Calendar.MINUTE, 10);
+
             oldPasswordResetToken.setToken(token);
+            oldPasswordResetToken.setExpirationTime(new Date(calendar.getTime().getTime()));
             passwordResetTokenRepository.save(oldPasswordResetToken);
         } else {
             PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
@@ -161,6 +183,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean checkIfValidOldPassword(User user, String oldPassword) {
         return passwordEncoder.matches(oldPassword, user.getPassword());
+    }
+
+    @Override
+    public boolean EmailExists(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return false;
+        } else {
+            return true;
+
+        }
+    }
+
+    @Override
+    public VerificationToken findVerificationTokenByuser(User user) {
+        VerificationToken verificationToken = verificationTokenRepository.findByUser(user);
+        return verificationToken;
     }
 
 }

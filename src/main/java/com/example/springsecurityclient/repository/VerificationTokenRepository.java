@@ -3,6 +3,7 @@ package com.example.springsecurityclient.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.example.springsecurityclient.entity.User;
 import com.example.springsecurityclient.entity.VerificationToken;
 
 @Repository
@@ -12,5 +13,7 @@ public interface VerificationTokenRepository
     VerificationToken findByToken(String token);
 
     void deleteByToken(String oldToken);
+
+    VerificationToken findByUser(User user);
 
 }

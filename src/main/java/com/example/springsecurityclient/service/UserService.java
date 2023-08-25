@@ -28,4 +28,8 @@ public interface UserService {
 
     boolean checkIfValidOldPassword(User user, String oldPassword);
 
+    boolean EmailExists(String email);
+
+    VerificationToken findVerificationTokenByuser(User user);
+
 }

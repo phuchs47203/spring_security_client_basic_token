@@ -33,11 +33,21 @@ public class RegistrationController {
 
     @PostMapping("/register")
     public String registerUser(@RequestBody UserModel userModel, final HttpServletRequest request) {
+
+        // Email of User is unique
+        if (userService.EmailExists(userModel.getEmail())) {
+            return "Email address already exists";
+        }
+
         User user = userService.registerUser(userModel);
         publisher.publishEvent(new RegistrationCompleteEvent(
                 user,
                 applicationUrl(request)));
-        return "Success";
+        VerificationToken verificcVerificationToken = userService.findVerificationTokenByuser(user);
+        String url = "http://localhost:8080"
+                + "/verifyRegistration?token="
+                + verificcVerificationToken.getToken();
+        return "Success " + "\nClick to verification for your account:  " + url;
     }
 
     @GetMapping("/resendVerifyToken")
@@ -50,8 +60,10 @@ public class RegistrationController {
         User user = verificationToken.getUser();
 
         resendVerificationTokenMail(user, applicationUrl(request), verificationToken);
-
-        return "Verification link sent";
+        String url = "http://localhost:8080"
+                + "/verifyRegistration?token="
+                + verificationToken.getToken();
+        return "Verification link sent" + "\nClick to verification for your account again:  " + url;
     }
 
     @PostMapping("/resetPassword")
