@@ -14,7 +14,7 @@ public interface UserService {
 
     String validateVerifiationToken(String token);
 
-    VerificationToken generateNewVerificationToken(String oldToken);
+    VerificationToken generateNewVerificationToken(String oldToken, String email);
 
     User findUserByEmail(String email);
 

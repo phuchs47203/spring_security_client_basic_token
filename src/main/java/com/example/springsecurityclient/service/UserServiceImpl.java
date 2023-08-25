@@ -76,8 +76,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public VerificationToken generateNewVerificationToken(String oldToken) {
+    public VerificationToken generateNewVerificationToken(String oldToken, String email) {
+        User user = userRepository.findByEmail(email);
         VerificationToken verificationToken = verificationTokenRepository.findByToken(oldToken);
+        if (verificationToken == null) {
+            VerificationToken newVerificationToken = new VerificationToken(user, UUID.randomUUID().toString());
+            verificationTokenRepository.save(newVerificationToken);
+            return newVerificationToken;
+        }
         // verificationTokenRepository.deleteBy(oldToken);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(new Date().getTime());

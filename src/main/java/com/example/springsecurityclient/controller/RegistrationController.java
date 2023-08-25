@@ -43,9 +43,10 @@ public class RegistrationController {
     @GetMapping("/resendVerifyToken")
     public String resendVerificationToken(
             @RequestParam("token") String oldToken,
+            @RequestParam("email") String email,
             HttpServletRequest request) {
 
-        VerificationToken verificationToken = userService.generateNewVerificationToken(oldToken);
+        VerificationToken verificationToken = userService.generateNewVerificationToken(oldToken, email);
         User user = verificationToken.getUser();
 
         resendVerificationTokenMail(user, applicationUrl(request), verificationToken);
