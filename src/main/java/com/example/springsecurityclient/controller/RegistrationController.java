@@ -1,10 +1,12 @@
 package com.example.springsecurityclient.controller;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +32,21 @@ public class RegistrationController {
 
     @Autowired
     private ApplicationEventPublisher publisher;
+
+    @GetMapping("/all")
+    public List<User> getAll() {
+        return userService.getAllUser();
+    }
+
+    @GetMapping("/home")
+    public String home() {
+        return "this is home page";
+    }
+
+    @GetMapping("/admin")
+    public String admin() {
+        return "this is Admin page";
+    }
 
     @PostMapping("/register")
     public String registerUser(@RequestBody UserModel userModel, final HttpServletRequest request) {

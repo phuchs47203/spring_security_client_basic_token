@@ -2,10 +2,12 @@ package com.example.springsecurityclient.service;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +44,6 @@ public class UserServiceImpl implements UserService {
         user.setLastName((userModel.getLastName()));
         user.setRole("USER");
         user.setPassword(passwordEncoder.encode(userModel.getPassword()));
-
         userRepository.save(user);
 
         return user;
@@ -200,6 +201,12 @@ public class UserServiceImpl implements UserService {
     public VerificationToken findVerificationTokenByuser(User user) {
         VerificationToken verificationToken = verificationTokenRepository.findByUser(user);
         return verificationToken;
+    }
+
+    @Override
+    public List<User> getAllUser() {
+        return userRepository.findAll();
+
     }
 
 }
