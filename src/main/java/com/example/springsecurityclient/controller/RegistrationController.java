@@ -45,7 +45,7 @@ public class RegistrationController {
 
     @GetMapping("/admin")
     public String admin() {
-        return "this is Admin page";
+        return "this is Admine page";
     }
 
     @PostMapping("/register")
@@ -90,7 +90,10 @@ public class RegistrationController {
 
         User user = userService.findUserByEmail(passwordModel.getEmail());
         String url = "";
+        if (user == null) {
+            return "Email address does not exists";
 
+        }
         if (user != null) {
             String token = UUID.randomUUID().toString();
             userService.createPasswordResetTokenForUser(user, token);
@@ -99,6 +102,7 @@ public class RegistrationController {
         return url;
     }
 
+    /// goirjg/grdkmrsk
     @GetMapping("/verifyRegistration")
     public String verifyRegistration(@RequestParam("token") String token) {
         String result = userService.validateVerifiationToken(token);
