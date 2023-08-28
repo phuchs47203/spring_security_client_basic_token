@@ -1,5 +1,7 @@
 package com.example.springsecurityclient.controller;
 
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -7,11 +9,14 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.springsecurityclient.entity.User;
 import com.example.springsecurityclient.entity.VerificationToken;
@@ -21,6 +26,8 @@ import com.example.springsecurityclient.model.UserModel;
 import com.example.springsecurityclient.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -43,10 +50,27 @@ public class RegistrationController {
         return "this is home page";
     }
 
-    @GetMapping("/admin")
-    public String admin() {
-        return "this is Admine page";
+    @GetMapping("/login-success")
+    public String loginSuccess(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userService.findUserByEmail(username);
+        userService.setExpirationTimeOfSession(user);
+        return username + "     " + user.getExpirationTimeOfSession();
     }
+
+    // @PostMapping("/login")
+    // public String login(
+    // @RequestParam("username") String username,
+    // @RequestParam("password") String password,
+    // HttpSession session) {
+    // // Xác minh thông tin đăng nhập
+    // // ...
+    // // Lưu thông tin đăng nhập vào session và thiết lập thời gian hết hạn
+    // session.setAttribute("username", username);
+    // session.setAttribute("expirationTime", System.currentTimeMillis() + (10 * 60
+    // * 1000)); // Hết hạn sau 10 phút
+    // return "Login successful";
+    // }
 
     @PostMapping("/register")
     public String registerUser(@RequestBody UserModel userModel, final HttpServletRequest request) {

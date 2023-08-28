@@ -1,5 +1,7 @@
 package com.example.springsecurityclient.model;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,5 +15,6 @@ public class UserModel {
     private String email;
     private String password;
     private String matchingPassword;
+    private Date expirationTimeOfSession;
 
 }

@@ -44,9 +44,27 @@ public class UserServiceImpl implements UserService {
         user.setLastName((userModel.getLastName()));
         user.setRole("USER");
         user.setPassword(passwordEncoder.encode(userModel.getPassword()));
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(new Date().getTime());
+        calendar.add(Calendar.MINUTE, 10);
+        user.setExpirationTimeOfSession(new Date(calendar.getTime().getTime()));
+
         userRepository.save(user);
 
         return user;
+    }
+
+    @Override
+    public Date setExpirationTimeOfSession(User user) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(new Date().getTime());
+        calendar.add(Calendar.MINUTE, 10);
+        user.setExpirationTimeOfSession(new Date(calendar.getTime().getTime()));
+
+        userRepository.save(user);
+        return new Date(calendar.getTime().getTime());
+
     }
 
     @Override
@@ -75,6 +93,8 @@ public class UserServiceImpl implements UserService {
         return "valid";
 
     }
+    ///
+    /// fisjfi
 
     @Override
     public VerificationToken generateNewVerificationToken(String oldToken, String email) {
@@ -207,6 +227,15 @@ public class UserServiceImpl implements UserService {
     public List<User> getAllUser() {
         return userRepository.findAll();
 
+    }
+
+    @Override
+    public boolean checkExpirationTimeOfSession(Date expirationTimeOfSession) {
+        if ((expirationTimeOfSession.getTime()
+                - Calendar.getInstance().getTime().getTime()) <= 0) {
+            return true;
+        }
+        return false;
     }
 
 }

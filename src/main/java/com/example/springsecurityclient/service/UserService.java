@@ -1,5 +1,6 @@
 package com.example.springsecurityclient.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,5 +39,9 @@ public interface UserService {
     VerificationToken findVerificationTokenByuser(User user);
 
     List<User> getAllUser();
+
+    Date setExpirationTimeOfSession(User user);
+
+    boolean checkExpirationTimeOfSession(Date expirationTimeOfSession);
 
 }

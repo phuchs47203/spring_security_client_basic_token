@@ -1,5 +1,6 @@
 package com.example.springsecurityclient.config;
 
+import org.springframework.boot.autoconfigure.security.reactive.PathRequest;
 import org.springframework.context.annotation.Bean;
 
 import org.springframework.context.annotation.Configuration;
@@ -19,19 +20,19 @@ public class WebSecurityConfig {
             "/register",
             "/verifyRegistration*",
             "/resendVerifyToken*",
-            "/all",
-            "changePassword",
             "/resetPassword",
             "/savePassword",
-            "/login"
-
+            "/login",
+            "/home"
     };
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    protected PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(11);
     }
 
+    /////
+    //
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -42,19 +43,34 @@ public class WebSecurityConfig {
                 .disable()
                 .authorizeRequests()
                 .requestMatchers(WHITE_LIST_URLS).permitAll()
-                .requestMatchers("/home")
-                .hasAuthority("USER")
-                .requestMatchers("/admin")
-                .hasAuthority("ADMIN")
+                .requestMatchers("/admin/{username}").hasAnyAuthority("ADMIN")
+                .requestMatchers("/admin/{username}/register").hasAnyAuthority("ADMIN")
+                .requestMatchers("/admin/{username}/all").hasAnyAuthority("ADMIN")
+                .requestMatchers("/admin/{username}/resetPassword").hasAnyAuthority("ADMIN")
+                .requestMatchers("/admin/{username}/changePassword").hasAnyAuthority("ADMIN")
+                .requestMatchers("/user/{username}").hasAnyAuthority("USER")
+                .requestMatchers("/user/{username}/editPost").hasAnyAuthority("USER")
+                .requestMatchers("/user/{username}/addPost").hasAnyAuthority("USER")
+                .requestMatchers("/user/{username}/addNewFriend").hasAnyAuthority("USER")
                 .anyRequest()
                 .authenticated()
                 .and()
                 .httpBasic()
                 .and()
-                .formLogin();
-        // .and()
-        // .formLogin();
-
+                .formLogin()
+                .defaultSuccessUrl("/login-success")
+                .and()
+                .rememberMe()
+                .tokenValiditySeconds(10)
+                .rememberMeParameter("remember-me")
+                .key("uniqueAndSecret");
+        //
+        //
+        /// gsgsdh
+        // gdsg/
+        ///
+        //
+        //
         return http.build();
 
     }

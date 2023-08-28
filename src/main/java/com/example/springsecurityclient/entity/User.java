@@ -1,5 +1,8 @@
 package com.example.springsecurityclient.entity;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,4 +23,6 @@ public class User {
     private String password;
     private String role;
     private boolean enabled = false;
+    private Date expirationTimeOfSession;
+
 }
