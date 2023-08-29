@@ -8,8 +8,14 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.example.springsecurityclient.entity.User;
 import com.example.springsecurityclient.entity.VerificationToken;
 import com.example.springsecurityclient.event.RegistrationCompleteEvent;
+import com.example.springsecurityclient.model.LoginRequest;
 import com.example.springsecurityclient.model.PasswordModel;
 import com.example.springsecurityclient.model.UserModel;
 import com.example.springsecurityclient.service.UserService;
@@ -32,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
+@CrossOrigin("http://localhost:3000/")
 public class RegistrationController {
 
     @Autowired
@@ -39,6 +47,32 @@ public class RegistrationController {
 
     @Autowired
     private ApplicationEventPublisher publisher;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @GetMapping("/authToken")
+    public String getAuthToken() {
+
+        return "authToken";
+    }
+
+    @PostMapping("/signin")
+    public ResponseEntity<String> authenticateUser(
+            @RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager
+                    .authenticate(
+                            new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+                                    loginRequest.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            User user = userService.findUserByEmail(loginRequest.getUsername());
+            userService.setExpirationTimeOfSession(user);
+            return new ResponseEntity<>("Login Successfully", HttpStatus.OK);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>("Login Failed", HttpStatus.UNAUTHORIZED);
+        }
+    }
 
     @GetMapping("/all")
     public List<User> getAll() {

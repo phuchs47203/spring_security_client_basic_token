@@ -5,17 +5,25 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.springsecurityclient.entity.User;
+import com.example.springsecurityclient.model.Post;
 import com.example.springsecurityclient.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
+@CrossOrigin("http://localhost:3000/")
 public class AdminController {
     @Autowired
     private UserService userService;
@@ -24,16 +32,40 @@ public class AdminController {
     private ApplicationEventPublisher publisher;
 
     @GetMapping("/admin/{username}/all")
-    public List<User> getAllByAdmin(@PathVariable("username") String username) {
+    public ResponseEntity<List<User>> getAllByAdmin(
+            @PathVariable("username") String username) {
         User user = userService.findUserByEmail(username);
         if (user.getRole().equals("USER")) {
-            return Collections.emptyList();
+            return new ResponseEntity<List<User>>(HttpStatus.UNAUTHORIZED);
         }
         if (userService.checkExpirationTimeOfSession(user.getExpirationTimeOfSession())) {
-            return Collections.emptyList();
+            return new ResponseEntity<List<User>>(HttpStatus.GONE);
         }
-        return userService.getAllUser();
+        List<User> allUser = userService.getAllUser();
+        return new ResponseEntity<>(allUser, HttpStatus.OK);
     }
+
+    @PostMapping("/admin/{username}/addPost")
+    public ResponseEntity<Post> authenticateUser(
+            @PathVariable("username") String username,
+            @RequestBody Post post) {
+        User user = userService.findUserByEmail(username);
+
+        if (user.getRole().equals("USER")) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(post, HttpStatus.OK);
+    }
+
+    ///
+    ///
+    ///
+    //
+    //
+
+    // editi oingvkd svosgn osgmrg gndsjog o
+    /// //
+    ///
 
     @GetMapping("/admin/{username}/register")
     public String adminRegister(@PathVariable("username") String username) {

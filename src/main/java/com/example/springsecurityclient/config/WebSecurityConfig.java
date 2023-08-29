@@ -4,7 +4,9 @@ import org.springframework.boot.autoconfigure.security.reactive.PathRequest;
 import org.springframework.context.annotation.Bean;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,7 +25,9 @@ public class WebSecurityConfig {
             "/resetPassword",
             "/savePassword",
             "/login",
-            "/home"
+            "/home",
+            "/authToken",
+            "/signin"
     };
 
     @Bean
@@ -32,6 +36,11 @@ public class WebSecurityConfig {
     }
 
     /////
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+
     //
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -45,6 +54,7 @@ public class WebSecurityConfig {
                 .requestMatchers(WHITE_LIST_URLS).permitAll()
                 .requestMatchers("/admin/{username}").hasAnyAuthority("ADMIN")
                 .requestMatchers("/admin/{username}/register").hasAnyAuthority("ADMIN")
+                .requestMatchers("/admin/{username}/addPost").hasAnyAuthority("ADMIN")
                 .requestMatchers("/admin/{username}/all").hasAnyAuthority("ADMIN")
                 .requestMatchers("/admin/{username}/resetPassword").hasAnyAuthority("ADMIN")
                 .requestMatchers("/admin/{username}/changePassword").hasAnyAuthority("ADMIN")
