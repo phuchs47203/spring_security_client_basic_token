@@ -2,11 +2,11 @@ sever:
   port: 8080
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/user_registration
-    username:
-    password:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: URL_TO_DATABASE
+    username: username_of_data_base
+    password: password_of_user
+    driver-class-name: your-driver_of_datatbase
   jpa:
-    show-sql: true
+    show-sql: true/false
     hibernate:
       ddl-auto: create-drop
